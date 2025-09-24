@@ -1,0 +1,551 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Doğum Günü Sürprizi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg1: #2a0b0b;
+            --bg2: #100c08;
+            --accent: #FFD700;
+            --light: #f0f0f0;
+            --muted: #a0a0a0;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Inter',Arial,sans-serif;
+            background: linear-gradient(135deg,var(--bg1),var(--bg2));
+            color: var(--light);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        #passwordForm {
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 0.5rem 2rem rgba(0,0,0,0.4);
+            width: 20rem;
+            max-width: 95%;
+            text-align: center;
+            transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+        }
+
+            #passwordForm h2 {
+                margin: 0 0 1rem;
+                font-size: 1.5rem;
+                font-weight: 600;
+            }
+
+        #password {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #333;
+            background: rgba(10,0,0,0.5);
+            color: #fff;
+            box-sizing: border-box;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: none;
+            background: var(--accent);
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+            button:hover {
+                background: #ffe675;
+                transform: translateY(-2px);
+            }
+
+        #errorMsg {
+            display: none;
+            color: #ff8a8a;
+            margin-top: 0.5rem;
+        }
+
+        #main {
+            display: none;
+            width: 100%;
+            max-width: 57rem;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            padding: 1.25rem;
+        }
+
+        .cake {
+            width: 20rem;
+            height: 11rem;
+            background: linear-gradient(#5c2a2a, #4a1414);
+            border-radius: 1.25rem;
+            margin: 0.625rem auto;
+            position: relative;
+            box-shadow: 0 0.5rem 1.875rem rgba(0,0,0,0.5);
+            transform: scale(0.9);
+            transition: transform 0.4s ease;
+        }
+
+            .cake:hover {
+                transform: scale(1);
+            }
+
+        .candle {
+            width: 1rem;
+            height: 3.5rem;
+            background: #f0f0f0;
+            border-radius: 0.5rem;
+            position: absolute;
+            top: -3.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+            .candle:hover {
+                transform: translateX(-50%) translateY(-0.25rem) scale(1.1);
+            }
+
+        .wick {
+            width: 0.125rem;
+            height: 0.625rem;
+            background: #111;
+            margin-top: 0.375rem;
+        }
+
+        .flame {
+            width: 1.25rem;
+            height: 1.875rem;
+            border-radius: 50% 50% 40% 40%;
+            background: radial-gradient(circle at 30% 30%, #fff080, var(--accent));
+            animation: flicker 0.12s infinite alternate;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        @keyframes flicker {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.1) translateY(-2px);
+            }
+        }
+
+        .flame-extinguish {
+            animation: extinguish 0.8s forwards;
+        }
+
+        @keyframes extinguish {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(0.1) translateY(-20px);
+            }
+        }
+
+        #confetti {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 30;
+        }
+
+        #envelope {
+            display: none;
+            margin: 1.25rem auto;
+            width: 22.5rem;
+            height: 15rem;
+            position: relative;
+            perspective: 56.25rem;
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        .envelope-box {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s ease;
+        }
+
+        .envelope-side {
+            position: absolute;
+            background: linear-gradient(to right, #4a1414, #2a0b0b);
+            border: 1px solid var(--accent);
+        }
+
+        .envelope-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg,#4a1414,#2a0b0b);
+            backface-visibility: hidden;
+        }
+
+        .flap-top {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            height: 50%;
+            background: linear-gradient(135deg,#4a1414,#2a0b0b);
+            clip-path: polygon(0 0,100% 0,50% 100%);
+            transform-origin: top;
+            transition: transform 0.8s;
+            z-index: 2;
+        }
+
+        .flap-bottom {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 50%;
+            background: linear-gradient(135deg,#4a1414,#2a0b0b);
+            clip-path: polygon(50% 0,100% 100%,0 100%);
+            transform-origin: bottom;
+            z-index: 1;
+        }
+
+        .envelope.open .flap-top {
+            transform: rotateX(180deg);
+        }
+
+        .envelope.open .envelope-box {
+            transform: rotateX(-20deg) rotateY(10deg);
+        }
+
+        .envelope-front-content {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #seal {
+            position: absolute;
+            width: 4rem;
+            height: 4rem;
+            background: var(--accent);
+            border-radius: 50%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%,-50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #000;
+            font-size: 2rem;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.8), inset 0 0 15px rgba(0, 0, 0, 0.3);
+            z-index: 25;
+            border: 2px solid #fff;
+        }
+
+        /* Kağıt panelinin arka planını zarfla eşleşecek şekilde değiştirir */
+        #paperPanel {
+            display: none;
+            margin-top: 1.125rem;
+            background: linear-gradient(135deg,#2a0b0b,#100c08); /* Zarf rengiyle eşleştirildi */
+            padding: 1.125rem;
+            border-radius: 0.625rem;
+            color: var(--light); /* Metin rengi okunabilir olması için değiştirildi */
+            max-width: 55rem; /* Kağıt boyutu büyütüldü */
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 0.5rem 1.875rem rgba(0,0,0,0.5);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-in, transform 0.6s ease-in;
+            z-index: 20;
+            position: relative;
+        }
+
+            /* Kağıt animasyonu */
+            #paperPanel.slide-in {
+                display: flex;
+                animation: slideUpAndFadeIn 1s forwards;
+            }
+
+        @keyframes slideUpAndFadeIn {
+            0% {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        #bigMessage {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0.2);
+            font-size: 2.6rem;
+            color: #fff;
+            text-shadow: 0 0 20px var(--accent);
+            opacity: 0;
+            z-index: 40;
+            pointer-events: none;
+            font-weight: 700;
+        }
+
+        .showMessage {
+            animation: popIn 0.9s forwards;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: translate(-50%, -50%) scale(0.2);
+                opacity: 0;
+            }
+
+            60% {
+                transform: translate(-50%, -50%) scale(1.15);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Fotoğraf boyutu sabitlemesi için yeni kural */
+        .panel-image {
+            width: 200px; /* Fotoğraf boyutu büyütüldü */
+            height: 200px; /* Fotoğraf boyutu büyütüldü */
+            object-fit: cover;
+            border-radius: 0.5rem;
+        }
+
+        @media (max-width:720px) {
+            .cake {
+                width: 18rem;
+                height: 10rem;
+            }
+
+            #envelope {
+                width: 20rem;
+                height: 13.5rem;
+            }
+
+            .letter-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            /* Mobil cihazlarda fotoğraf boyutunu ayarlar */
+            .panel-image {
+                width: 10rem; /* Fotoğraf boyutu mobil için büyütüldü */
+                height: 10rem; /* Fotoğraf boyutu mobil için büyütüldü */
+                margin-bottom: 1rem;
+            }
+
+            .letter-text {
+                text-align: center;
+            }
+
+            #paperPanel {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="passwordForm">
+            <h2>Şifreyi Gir</h2>
+            <form id="loginForm">
+                <input id="password" type="password" placeholder="Şifre..." required>
+                <button type="submit">Gönder</button>
+            </form>
+            <div id="errorMsg">❌ Yanlış şifre!</div>
+        </div>
+
+        <main id="main">
+            <div id="cakeWrap">
+                <h1>🎂 İyi ki Doğdun!</h1>
+                <p>Pastaya tıkla ve mumları üfle</p>
+                <div class="cake relative">
+                    <div id="candle" class="candle">
+                        <div class="wick"></div>
+                        <div id="flame" class="flame"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="envelope">
+                <div class="envelope-box">
+                    <div class="envelope-back"></div>
+                    <div class="side-left envelope-side"></div>
+                    <div class="side-right envelope-side"></div>
+                    <div class="flap-bottom envelope-side"></div>
+                    <div class="flap-top"></div>
+                    <div id="seal">💌</div>
+                    <div class="envelope-front-content">
+                        <div class="letter-content flex flex-col md:flex-row gap-4 justify-center items-center h-full">
+                            <img id="letterImg" src="https://placehold.co/150x150/FFD700/000000?text=Resim" alt="Mektup Resmi">
+                            <div class="letter-text">
+                                <h2>🎉 İyi ki Doğdun 🎉</h2>
+                                <p id="letterText">Buraya yazı gelecek.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="paperPanel">
+                <div class="letter-content flex flex-col md:flex-row gap-4 justify-center items-center">
+                    <!-- Fotoğrafın boyutu büyütüldü ve yerel dosya URL'si yerine bir yer tutucu URL kullanıldı -->
+                    <img id="panelImg" class="panel-image" src="foto/aşk.png" alt="Mektup Resmi">
+
+                    <div class="letter-text">
+                        <h2>🎉 İyi ki Doğdun 🎉</h2>
+                        <p id="panelText">
+                            İyi ki doğdun sevgilim. Yeni yaşında Rabbim gönlünden geçenleri hayırlısı ile güzelikle kolaylıkla yaşamanı nasip etsin.
+                            Bu hayatta inanmazsın belki ama en büyük duamın kabulüsün. Dilerim ki tüm ömrün boyunca o muhteşem yakışıklılığın, mükemmelliğin, bana
+                            hayatı daha da anlamlandıran o gülüşün hiç solmasın inşallah herşey tam da hayal ettiğin gibi olur bu ve bundan sonra ki her yaşında.
+                            Nice benli ve tüm sevdiklerinle musmutlu yıllara Seni çoook seviyorumm HAPPY BİRTHDAY HUSBAND
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="bigMessage">🎉 MUTLU YILLAR 🎉</div>
+        </main>
+    </div>
+
+    <canvas id="confetti"></canvas>
+
+    <!-- Yerel ses dosyaları tarayıcı kısıtlamaları nedeniyle çalışmaz, bu yüzden kod dışı bırakıldı. -->
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const loginForm = document.getElementById('loginForm');
+            const passwordInput = document.getElementById('password');
+            const errorMsg = document.getElementById('errorMsg');
+            const passwordForm = document.getElementById('passwordForm');
+            const main = document.getElementById('main');
+            const cakeWrap = document.getElementById('cakeWrap');
+            const candle = document.getElementById('candle');
+            const flame = document.getElementById('flame');
+            const envelope = document.getElementById('envelope');
+            const seal = document.getElementById('seal');
+            const bigMessage = document.getElementById('bigMessage');
+            const paperPanel = document.getElementById('paperPanel');
+            // const blowSound = document.getElementById('blowSound'); // Yerel ses dosyası kaldırıldı
+            // const music = document.getElementById('music'); // Yerel ses dosyası kaldırıldı
+            const canvas = document.getElementById('confetti');
+            const ctx = canvas.getContext('2d');
+
+            function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const correctPassword = '1205';
+                if (passwordInput.value.trim() === correctPassword) {
+                    passwordForm.style.transform = 'translateY(100%)';
+                    passwordForm.style.opacity = '0';
+                    setTimeout(() => {
+                        passwordForm.classList.add('hidden');
+                        main.style.display = 'block';
+                        setTimeout(() => main.style.opacity = '1', 50);
+                    }, 500);
+                } else { errorMsg.style.display = 'block'; }
+            });
+            passwordInput.addEventListener('input', () => { if (errorMsg.style.display === 'block') errorMsg.style.display = 'none'; });
+
+            let confetti = [], animating = false;
+            function startConfetti() {
+                confetti = []; const total = Math.min(300, Math.floor((canvas.width * canvas.height) / 10000));
+                for (let i = 0; i < total; i++) { const hue = Math.floor(Math.random() * 360); confetti.push({ x: Math.random() * canvas.width, y: Math.random() * -canvas.height, w: Math.random() * 8 + 6, h: Math.random() * 6 + 4, tilt: Math.random() * 20 - 10, tiltspeed: Math.random() * 0.1 + 0.02, speed: Math.random() * 3 + 1, color: `hsl(${hue},85%,55%)` }); }
+                if (!animating) { animating = true; requestAnimationFrame(drawConfetti); }
+            }
+            function drawConfetti() { ctx.clearRect(0, 0, canvas.width, canvas.height); confetti.forEach(p => { ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.tilt * 0.02); ctx.fillStyle = p.color; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore(); p.x += Math.sin(p.tilt) * 0.5 + p.speed * 0.3; p.y += p.speed; p.tilt += p.tiltspeed; if (p.y > canvas.height + 20) { p.y = Math.random() * -canvas.height; p.x = Math.random() * canvas.width; } }); if (animating) requestAnimationFrame(drawConfetti); }
+
+            let extinguished = false;
+            candle.addEventListener('click', async () => {
+                if (extinguished) return;
+                extinguished = true;
+                flame.classList.add('flame-extinguish');
+                // try { await blowSound.play(); } catch (e) { console.log(e); } // Ses çalma kodu kaldırıldı
+                // setTimeout(() => { try { music.play(); } catch (e) { console.log(e); } }, 800); // Müzik çalma kodu kaldırıldı
+                bigMessage.classList.add('showMessage');
+                startConfetti();
+                setTimeout(() => {
+                    cakeWrap.style.opacity = '0';
+                    cakeWrap.style.transform = 'scale(0.8)';
+                    setTimeout(() => {
+                        cakeWrap.classList.add('hidden');
+                        envelope.style.display = 'block';
+                        envelope.setAttribute('aria-hidden', 'false');
+                    }, 600);
+                }, 1000);
+            });
+
+            envelope.addEventListener('click', () => {
+                envelope.classList.add('open');
+                seal.style.display = 'none';
+                paperPanel.classList.add('slide-in');
+                setTimeout(() => {
+                    envelope.style.opacity = '0';
+                    envelope.style.pointerEvents = 'none';
+                }, 800);
+            });
+
+            window.SET_LETTER = function ({ imgSrc, htmlText }) {
+                const letterImg = document.getElementById('letterImg');
+                const panelImg = document.getElementById('panelImg');
+                const letterText = document.getElementById('letterText');
+                const panelText = document.getElementById('panelText');
+                if (imgSrc) { letterImg.src = imgSrc; panelImg.src = imgSrc; }
+                if (htmlText) { letterText.innerHTML = htmlText; panelText.innerHTML = htmlText; }
+            };
+        });
+    </script>
+</body>
+</html>
