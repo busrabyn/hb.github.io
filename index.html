@@ -20,7 +20,7 @@
             font-family: 'Inter',Arial,sans-serif;
             background: linear-gradient(135deg,var(--bg1),var(--bg2));
             color: var(--light);
-            overflow: hidden;
+            /* overflow: hidden; Düzeltme: Mobil cihazlarda kaydırma sorununu önlemek için 'overflow: hidden' kaldırıldı veya sadece gerekli yerlerde kullanıldı */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -100,6 +100,7 @@
             opacity: 0;
             transition: opacity 1s ease-in-out;
             padding: 1.25rem;
+            box-sizing: border-box; /* Düzeltme: Padding'in genişliğe dahil olmasını sağla */
         }
 
         .cake {
@@ -298,6 +299,7 @@
             transition: opacity 0.6s ease-in, transform 0.6s ease-in;
             z-index: 20;
             position: relative;
+            box-sizing: border-box; /* Düzeltme: Padding'in genişliğe dahil olmasını sağla */
         }
 
             /* Kağıt animasyonu */
@@ -359,9 +361,33 @@
             height: 200px; /* Fotoğraf boyutu büyütüldü */
             object-fit: cover;
             border-radius: 0.5rem;
+            flex-shrink: 0; /* Düzeltme: Resmin daralmasını engeller */
         }
 
-        @media (max-width:720px) {
+        /* Düzeltme: Metin alanının sarmalaması ve hizalanması */
+        .letter-text {
+            flex-grow: 1;
+            text-align: left; /* Masaüstünde metin sola hizalı başlasın */
+        }
+
+            .letter-text h2 {
+                margin-top: 0;
+            }
+
+
+        @media (max-width:768px) { /* Mobil uyumluluk için genişlik 720px'den 768px'e yükseltildi */
+            /* Düzeltme: Ana içerik alanının daha fazla yer kaplamasına izin ver */
+            #main {
+                max-width: 100%;
+                padding: 0.5rem; /* Mobil cihazlarda daha az padding */
+            }
+
+            /* Düzeltme: Kağıt paneli için mobil uyumluluk */
+            #paperPanel {
+                max-width: 95%;
+                padding: 1rem;
+            }
+
             .cake {
                 width: 18rem;
                 height: 10rem;
@@ -372,23 +398,28 @@
                 height: 13.5rem;
             }
 
+            /* Düzeltme: Mobil cihazlarda fotoğraf ve metin dikey olarak hizalanır */
             .letter-content {
                 flex-direction: column;
                 text-align: center;
+                gap: 1rem; /* Öğeler arasındaki boşluk */
             }
+
             /* Mobil cihazlarda fotoğraf boyutunu ayarlar */
             .panel-image {
                 width: 10rem; /* Fotoğraf boyutu mobil için büyütüldü */
                 height: 10rem; /* Fotoğraf boyutu mobil için büyütüldü */
-                margin-bottom: 1rem;
+                margin-bottom: 0.5rem; /* Dikey düzende alttan boşluk */
             }
 
             .letter-text {
-                text-align: center;
+                text-align: center; /* Mobil cihazlarda metin ortalanır */
+                padding-bottom: 1rem; /* Panel altından biraz boşluk bırak */
             }
 
-            #paperPanel {
-                width: 90%;
+            /* HTML ve body'den overflow: hidden kaldırıldığı için bu artık gerekli olmayabilir, ancak esnekliği korumak için bırakıldı */
+            html, body {
+                overflow-y: auto; /* Mobil cihazlarda içerik sığmazsa kaydırmaya izin ver */
             }
         }
     </style>
@@ -438,7 +469,6 @@
 
             <div id="paperPanel">
                 <div class="letter-content flex flex-col md:flex-row gap-4 justify-center items-center">
-                    <!-- Fotoğrafın boyutu büyütüldü ve yerel dosya URL'si yerine bir yer tutucu URL kullanıldı -->
                     <img id="panelImg" class="panel-image" src="foto/aşk.png" alt="Mektup Resmi">
 
                     <div class="letter-text">
@@ -458,8 +488,6 @@
     </div>
 
     <canvas id="confetti"></canvas>
-
-    <!-- Yerel ses dosyaları tarayıcı kısıtlamaları nedeniyle çalışmaz, bu yüzden kod dışı bırakıldı. -->
 
     <script>
         window.addEventListener('DOMContentLoaded', () => {
